@@ -7,6 +7,5 @@
     "diff": 0,
     "visc": 0,
     "draw": "mix",
-    "fps": 20,
-    "save_grids": 0
+    "fps": 20
 }

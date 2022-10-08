@@ -2,14 +2,6 @@ import numpy as np
 
 
 def taylorgreen_velocity(coords: np.ndarray):
-    """taylorgreen velocity. domain: [0, 2pi] x [0, 2pi].
-
-    Args:
-        coords (np.ndarray): coordinates of shape (..., 2)
-
-    Returns:
-        velocity: velocity at coordinates
-    """
     A = 1
     a = 1
     B = -1
@@ -26,5 +18,6 @@ setup = {
     "domain": [[0, 2 * np.pi], [0, 2 * np.pi]],
     "vsource": taylorgreen_velocity,
     "dsource": None,
-    "src_duration": 1
+    "src_duration": 1,
+    "boundary_func": None
 }

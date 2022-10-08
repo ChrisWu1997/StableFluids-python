@@ -34,5 +34,6 @@ setup = {
     "domain": [[-1, 1], [-1, 1]],
     "vsource": inflow_velocity,
     "dsource": inflow_density,
-    "src_duration": 60
+    "src_duration": 60,
+    "boundary_func": None
 }

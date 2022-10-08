@@ -1,0 +1,11 @@
+{
+    "tag": "karman",
+    "example": "karman",
+    "N": 256,
+    "dt": 0.1,
+    "T": 600,
+    "diff": 0,
+    "visc": 0,
+    "draw": "curl",
+    "fps": 40
+}

@@ -19,7 +19,7 @@ with open(path, "w") as fp:
 setup = get_example_setup(cfg["example"])
 
 # init
-fluid = StableFluids(cfg["N"], cfg["dt"], setup["domain"], cfg["visc"], cfg["diff"])
+fluid = StableFluids(cfg["N"], cfg["dt"], setup["domain"], cfg["visc"], cfg["diff"], setup["boundary_func"])
 
 # set initial condition
 fluid.add_source("velocity", setup["vsource"])
