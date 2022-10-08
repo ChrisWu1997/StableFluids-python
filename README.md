@@ -12,7 +12,7 @@ A pure-python implementation of Stable Fluids with stagger grids.
 | | **Kármán vortex street**       | **Inflow**           | 
 |Command| ```python run.py -c configs/karman.json```      | ```python run.py -c configs/inflow.json``` | 
 |Visualization| curl(vorticity)      | R: curl, G: 1, B: density      | 
-|| <img src="figures/karman.gif" width="400" height="200"/> | <img src="figures/inflow.gif" width="300" height="300"/> | 
+|| <img src="figures/karman.gif" width="300" height="150"/> | <img src="figures/inflow.gif" width="300" height="300"/> | 
 
 To setup new examples, simply add a cooresponding python file under `examples` folder.
 
