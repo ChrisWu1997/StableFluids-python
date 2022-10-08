@@ -27,14 +27,17 @@ fluid.add_source("density", setup["dsource"])
 
 # run simulation and draw frames
 fluid.draw(cfg["draw"], os.path.join(draw_dir, f"{0:04d}.png"))
-for i in tqdm(range(1, cfg["T"] + 1), desc="Simulate and draw"):
-    fluid.step()
+pbar = tqdm(range(1, cfg["T"] + 1), desc="Simulate and draw")
+for i in pbar:
+    runtime = fluid.step()
 
-    fluid.draw(cfg["draw"], os.path.join(draw_dir, f"{i:04d}.png"))
+    drawtime = fluid.draw(cfg["draw"], os.path.join(draw_dir, f"{i:04d}.png"))
 
     if i < setup["src_duration"]:
         fluid.add_source("velocity", setup["vsource"])
         fluid.add_source("density", setup["dsource"])
+
+    pbar.set_postfix({"runtime": round(runtime, 6), "drawtime": round(drawtime, 6)})
 
 # frames to gif animation
 save_path = os.path.join(os.path.dirname(draw_dir), f"anim_{cfg['draw']}.gif")

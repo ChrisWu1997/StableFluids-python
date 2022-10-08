@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from functools import partial
 from scipy.ndimage import map_coordinates
@@ -135,9 +136,14 @@ class StableFluids(object):
 
     def step(self):
         """Integrates the system forward in time by dt."""
+        since = time.time()
+        
         self._velocity_step()
         self._density_step()
         self.timestep += 1
+        
+        timecost = time.time() - since
+        return timecost
     
     def _density_step(self):
         """update density field by one timestep"""
@@ -245,6 +251,8 @@ class StableFluids(object):
 
     def draw(self, attr: str, save_path: str):
         """draw a frame"""
+        since = time.time()
+
         if attr == "velocity":
             draw_velocity(self.grid_velocity, save_path)
         elif attr == "curl":
@@ -255,3 +263,6 @@ class StableFluids(object):
             draw_mix(self.grid_curl, self.grid_density, save_path)
         else:
             raise NotImplementedError
+
+        timecost = time.time() - since
+        return timecost
