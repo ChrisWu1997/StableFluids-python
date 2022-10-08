@@ -1,0 +1,12 @@
+{
+    "tag": "vortexsheet",
+    "example": "vortexsheet",
+    "N": 128,
+    "dt": 0.025,
+    "T": 100,
+    "diff": 0,
+    "visc": 0,
+    "draw": "density",
+    "fps": 20,
+    "save_grids": 0
+}
