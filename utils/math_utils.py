@@ -27,39 +27,13 @@ def build_laplacian_matrix(M: int, N: int):
 
 
 def compute_curl(velocity_field: np.ndarray, h: float):
-    """compute curl(vorticity) of a velocity field
+    """compute curl(vorticity) of a 2D velocity field
 
     Args:
         velocity_field (np.ndarray): velocity field of shape (M, N, 2)
         h (float): grid size
     """
-    def partial_derivative_x(field):
-        diff = np.zeros_like(field)
-        diff[1:-1, 1:-1] = (
-            (
-                field[2:  , 1:-1]
-                -
-                field[0:-2, 1:-1]
-            ) / (
-                2 * h
-            )
-        )
-        return diff
-
-    def partial_derivative_y(field):
-        diff = np.zeros_like(field)
-        diff[1:-1, 1:-1] = (
-            (
-                field[1:-1, 2:  ]
-                -
-                field[1:-1, 0:-2]
-            ) / (
-                2 * h
-            )
-        )
-        return diff
-
-    v_x = velocity_field[..., 0]
-    v_y = velocity_field[..., 1]
-    curl = partial_derivative_x(v_y) - partial_derivative_y(v_x)
+    dvy_dx = np.gradient(velocity_field[..., 1], h)[0]
+    dvx_dy = np.gradient(velocity_field[..., 0], h)[1]
+    curl = dvy_dx - dvx_dy
     return curl

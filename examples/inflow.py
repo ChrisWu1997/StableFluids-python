@@ -10,7 +10,7 @@ def create_circular_points(point_dist: float, point_count: int):
     return points, normals
 
 
-def inflow_velocity(coords: np.ndarray, vel: float=1. / 250, point_radius: float=0.032, point_dist: float=0.8, point_count: int=4):
+def inflow_velocity(coords: np.ndarray, vel: float=0.01, point_radius: float=0.05, point_dist: float=0.8, point_count: int=4):
     points, normals = create_circular_points(point_dist, point_count)
 
     inflow_velocity = np.zeros_like(coords)
@@ -20,7 +20,7 @@ def inflow_velocity(coords: np.ndarray, vel: float=1. / 250, point_radius: float
     return inflow_velocity
 
 
-def inflow_density(coords: np.ndarray, point_radius: float=0.032, point_dist: float=0.8, point_count: int=4):
+def inflow_density(coords: np.ndarray, point_radius: float=0.05, point_dist: float=0.8, point_count: int=4):
     points, normals = create_circular_points(point_dist, point_count)
 
     inflow_density = np.zeros(coords.shape[:-1])

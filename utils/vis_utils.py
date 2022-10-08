@@ -1,11 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from tqdm import tqdm
 from PIL import Image
 import os
 from scipy.special import erf
-from .math_utils import compute_curl
 
 
 def draw_velocity(arr: np.ndarray, save_path=None, figsize=(4, 4)):
@@ -45,9 +43,8 @@ def draw_density(density: np.ndarray, save_path=None):
 
 def draw_mix(curl: np.ndarray, density: np.ndarray, save_path=None):
     """R: curl, G: 1, B: density"""
-    curl = (erf(curl) + 2) / 4
+    curl = (erf(curl) + 1) / 2
     img = np.dstack((curl, np.ones_like(curl), density))
-    # img = np.dstack((curl, np.ones_like(curl), density))
     img = (np.clip(img, 0, 1) * 255).astype('uint8')
     img = Image.fromarray(img, mode='HSV').convert('RGB')
     if save_path is not None:
