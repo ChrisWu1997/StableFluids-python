@@ -7,7 +7,7 @@ from utils import parse_args, frames2gif
 
 # read config
 cfg = parse_args()
-output_dir = f"outputs/{cfg['example']}"
+output_dir = f"outputs/{cfg['tag']}"
 os.makedirs(output_dir, exist_ok=True)
 draw_dir = os.path.join(output_dir, cfg["draw"])
 os.makedirs(draw_dir, exist_ok=True)

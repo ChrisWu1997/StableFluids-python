@@ -192,6 +192,11 @@ class StableFluids(object):
 
     def _advectVel(self):
         """addvect velocity field"""
+        self._v_grid[:, 0] = self._v_grid[:, 1]
+        self._v_grid[:, -1] = self._v_grid[:, -2]
+        self._u_grid[0] = self._u_grid[1]
+        self._u_grid[-1] = self._u_grid[-2]
+
         new_u_grid = self._advectU()
         new_v_grid = self._advectV()
         self._u_grid[1:-1, :] = new_u_grid
