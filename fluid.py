@@ -58,7 +58,7 @@ class StableFluids(object):
         self._grid_indices = np.indices(self._d_grid.shape)
 
         # interpolation function
-        self.interpolate = partial(map_coordinates, 
+        self._interp_func = partial(map_coordinates, 
             order=1, prefilter=False, mode='constant', cval=0)
 
         # boundary condition function
@@ -99,6 +99,24 @@ class StableFluids(object):
         """curl(vorticity) values at grid centers"""
         curl = compute_curl(self.grid_velocity, self.h)
         return curl
+
+    def _interpolateD(self, i_arr, j_arr):
+        """interpolate d_grid with global indices"""
+        i_arr = np.clip(i_arr, 1, self.M)
+        j_arr = np.clip(j_arr, 1, self.N)
+        return self._interp_func(self._d_grid, np.stack([i_arr, j_arr]))
+
+    def _interpolateU(self, i_arr, j_arr):
+        """interpolate u_grid with global indices"""
+        i_arr = np.clip(i_arr, 1, self.M)
+        j_arr = np.clip(j_arr - 0.5, 0, self.N)
+        return self._interp_func(self._u_grid, np.stack([i_arr, j_arr]))
+
+    def _interpolateV(self, i_arr, j_arr):
+        """interpolate v_grid with global indices"""
+        i_arr = np.clip(i_arr - 0.5, 0, self.M)
+        j_arr = np.clip(j_arr, 1, self.N)
+        return self._interp_func(self._v_grid, np.stack([i_arr, j_arr]))
 
     def _transform_coords(self, coords, offset):
         """transform coords in grid space to original domain"""
@@ -184,19 +202,13 @@ class StableFluids(object):
 
     def _advectD(self):
         """advect density for ([1, M], [1, N])"""
-        i_back = self._grid_indices[0, 1:-1, 1:-1] - self.dt / self.h * (
-            self._v_grid[:-1, 1:-1] + self._v_grid[1:, 1:-1]) / 2
-        j_back = self._grid_indices[1, 1:-1, 1:-1] - self.dt / self.h * (
-            self._u_grid[1:-1, :-1] + self._u_grid[1:-1, 1:]) / 2
-        self._d_grid[1:-1, 1:-1] = self.interpolate(self._d_grid, np.stack([i_back, j_back]))
+        ij_arr = self._grid_indices[:, 1:-1, 1:-1].astype(float)
+        i_back = ij_arr[0] - self.dt / self.h * self._interpolateV(ij_arr[0], ij_arr[1])
+        j_back = ij_arr[1] - self.dt / self.h * self._interpolateU(ij_arr[0], ij_arr[1])
+        self._d_grid[1:-1, 1:-1] = self._interpolateD(i_back, j_back)
 
     def _advectVel(self):
         """addvect velocity field"""
-        self._v_grid[:, 0] = self._v_grid[:, 1]
-        self._v_grid[:, -1] = self._v_grid[:, -2]
-        self._u_grid[0] = self._u_grid[1]
-        self._u_grid[-1] = self._u_grid[-2]
-
         new_u_grid = self._advectU()
         new_v_grid = self._advectV()
         self._u_grid[1:-1, :] = new_u_grid
@@ -204,20 +216,20 @@ class StableFluids(object):
 
     def _advectU(self):
         """advect horizontal velocity (u) for ([1, M], [0, N])"""
-        i_back = self._grid_indices[0, 1:-1, :-1] - self.dt / self.h * (
-            self._v_grid[:-1, :-1] + self._v_grid[1:, :-1] + self._v_grid[:-1, 1:] + self._v_grid[1:, 1:]) / 4
-        j_back = self._grid_indices[1, 1:-1, :-1] - self.dt / self.h * self._u_grid[1:-1]
-        i_back = np.clip(i_back, 0.5, self.M + 0.5)
-        new_u_grid = self.interpolate(self._u_grid, np.stack([i_back, j_back]))
+        ij_arr = self._grid_indices[:, 1:-1, :-1].astype(float)
+        ij_arr[1] += 0.5
+        i_back = ij_arr[0] - self.dt / self.h * self._interpolateV(ij_arr[0], ij_arr[1])
+        j_back = ij_arr[1] - self.dt / self.h * self._interpolateU(ij_arr[0], ij_arr[1])
+        new_u_grid = self._interpolateU(i_back, j_back)
         return new_u_grid
 
     def _advectV(self):
         """advect vertical velocity (v) for ([0, M], [1, N])"""
-        i_back = self._grid_indices[0, :-1, 1:-1] - self.dt / self.h * self._v_grid[:, 1:-1]
-        j_back = self._grid_indices[1, :-1, 1:-1] - self.dt / self.h * (
-            self._u_grid[:-1, :-1] + self._u_grid[1:, :-1] + self._u_grid[:-1, 1:] + self._u_grid[1:, 1:]) / 4
-        j_back = np.clip(j_back, 0.5, self.N + 0.5)
-        new_v_grid = self.interpolate(self._v_grid, np.stack([i_back, j_back]))
+        ij_arr = self._grid_indices[:, :-1, 1:-1].astype(float)
+        ij_arr[0] += 0.5
+        i_back = ij_arr[0] - self.dt / self.h * self._interpolateV(ij_arr[0], ij_arr[1])
+        j_back = ij_arr[1] - self.dt / self.h * self._interpolateU(ij_arr[0], ij_arr[1])
+        new_v_grid = self._interpolateV(i_back, j_back)
         return new_v_grid
 
     def _solve_pressure(self):
